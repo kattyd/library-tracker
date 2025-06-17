@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BookForm from "./components/BookForm";
 import BookList from "./components/BookList";
 import BookSearch from "./components/BookSearch";
+import Stats from "./components/Stats";
 
 function App() {
   const [books, setBooks] = useState(() => {
@@ -12,6 +13,13 @@ function App() {
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [showManualForm, setShowManualForm] = useState(false);
+  const [readingGoal, setReadingGoal] = useState(10);
+
+  const booksRead = books.filter(book => book.status === "read").length;
+  const readingProgress = Math.min((booksRead / readingGoal) * 100, 100).toFixed(0);
+  const totalBooks = books.length;
+  const currentlyReading = books.filter(book => book.status === "reading").length;
+  const unreadBooks = books.filter(book => book.status === "unread").lenght;
 
   useEffect(() => {
     localStorage.setItem("my-books", JSON.stringify(books));
@@ -80,7 +88,15 @@ function App() {
           />
         </form>
       </section>
-
+      <Stats 
+        total={totalBooks}
+        read={booksRead}
+        reading={currentlyReading}
+        unread={unreadBooks}
+        goal={readingGoal}
+        progress={readingProgress}
+        onGoalChange={setReadingGoal}
+      />
       <main>
         <BookList
           books={filteredBooks}
@@ -91,7 +107,7 @@ function App() {
 
       <footer>
         <p>
-          Made with ❤️ by <a href="#">You</a>
+          Made with ❤️ by <a href="instagram.com/kaaahtea">kaaahtea</a>
         </p>
       </footer>
     </div>
