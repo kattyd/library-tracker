@@ -10,6 +10,9 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [darkMode, setDarkMode ] = useState(() => {
+    return localStorage.getItem("darkMode") === "true";
+  });
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [showManualForm, setShowManualForm] = useState(false);
@@ -28,6 +31,11 @@ function App() {
   const addBook = (book) => {
     setBooks([book, ...books]);
   };
+
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", darkMode);
+    localStorage.setItem("darkMode", darkMode);
+  }, [darkMode]);
 
   const updateProgress = (id, newProgress, newStatus) => {
     const updated = books.map(book =>
@@ -50,10 +58,25 @@ function App() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleExport = () => {
+    const dataStr = JSON.stringify(books, null, 2);
+    const blob = new Blob([dataStr], { type: "application.json"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "my-library.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="app-container">
       <header>
         <h1>📚 my library tracker</h1>
+        <button onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? "🌞 light mode" : "🌙 dark mode"}
+        </button>
       </header>
 
       <section>
@@ -110,6 +133,7 @@ function App() {
           Made with ❤️ by <a href="instagram.com/kaaahtea">kaaahtea</a>
         </p>
       </footer>
+      <button onClick={handleExport}>📁 export library</button>
     </div>
   );
 }
